@@ -43,6 +43,11 @@ class UserModel {
         return executeQuery(sql, userParams);
     }
 
+    getUserByEmail(email) { 
+        const sql = `SELECT * FROM user WHERE email='${email}'`
+        return executeQuery(sql);
+    }
+
 }
 
 
