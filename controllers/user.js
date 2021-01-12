@@ -16,4 +16,25 @@ module.exports = app => {
             res.status(400).send();
         }
     })
+
+    app.post('/user/sign-up', async (req, res) => {
+        const user = req.body;
+
+        try {
+            
+            const result = await UserModel.getUserByEmail(user.email)
+            if(result.length > 0) {
+                res.status(400).json({error:'e-mail já cadastrado'});
+                return;
+            } 
+            
+            await UserModel.insertUser(user)
+            res.status(200).json(user);
+
+        } catch (err) {
+            console.error(err);
+            res.status(400).send();
+        }
+
+    });
 }
