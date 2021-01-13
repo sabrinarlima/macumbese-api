@@ -82,6 +82,11 @@ class UserModel {
         return executeQuery(`${sql}${whereClause}`);
     }
 
+    validateToken(userToken) {
+        const sql = `SELECT * FROM user WHERE userToken='${userToken}'`
+        return executeQuery(sql);
+    }
+
 }
 
 
