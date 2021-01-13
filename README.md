@@ -47,6 +47,28 @@
 
 - Status: `204`
 
+### POST - `/user/verify/`
+
+
+#### Request
+
+```json
+{
+    "email": "sergio_alcides13@gmail.com",
+    "phone": "1199571100"
+}
+```
+
+#### Response
+
+Caso exista:
+- Status: `204`
+
+Caso não:
+- Status: `404`
+
+
+
 
 ### PUT - `/user/profile/update`
 
@@ -222,19 +244,19 @@
         "billings": {
             "pending": [
                 {
-                    "id": "565f491c-5147-11eb-ae93-0242ac130002"
-            "value": 30,
+                    "id": "565f491c-5147-11eb-ae93-0242ac130002",
+                    "value": 30,
                     "due-date": "20/10/2020"
                 },
                 {
-                    "id": "565f491c-5147-11eb-ae93-0242ac130002"
-            "value": 30,
+                    "id": "565f491c-5147-11eb-ae93-0242ac130002",
+                    "value": 30,
                     "due-date": "20/11/2020"
                 }
             ],
             "next-due": {
-                "id": "565f491c-5147-11eb-ae93-0242ac130002"
-            "value": 35,
+                "id": "565f491c-5147-11eb-ae93-0242ac130002",
+                "value": 35,
                 "due-date": "30/12/2020",
             }
         }
