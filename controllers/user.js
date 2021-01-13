@@ -1,4 +1,6 @@
 const UserModel = require('../models/user');
+const authentication = require('../middlewares/authentication');
+
 module.exports = app => {
     app.post('/user/login', async (req, res) => {
         const credentials = req.body;
@@ -48,8 +50,6 @@ module.exports = app => {
         } else {
             res.status(404).json(user);
         }
-
-
-    })
+    });
 }
 
