@@ -1,6 +1,6 @@
 const { executeQuery } = require('../config/database');
 const { v4: uuidv4 } = require('uuid');
-const moment = require('moment');
+const UserParser = require('../parser/UserParser');
 
 const mapProperties = {
     'name': 'name',
@@ -36,26 +36,8 @@ class UserModel {
         return token;
     }
 
-    convertUserToEntity(user) {
-        return {
-            name: user.name,
-            email: user.email,
-            relationType: user['relation-type'],
-            password: user.password,
-            dtBirth: moment(user['date-of-birth'], 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss'),
-            streetAd: user['street-address'],
-            zipcode: user.zipcode,
-            city: user.city,
-            state: user.state,
-            phone1: user.phone,
-            phone2: user['phone-2'],
-            dueDay: user['due-day'],
-            since: moment(user.since, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss')
-        };
-    }
-
     insertUser(user) {
-        const userParams = convertUserToEntity(user);
+        const userParams = UserParser.toEntity(user);
         userParams.id = uuidv4();
         const sql = `INSERT INTO user SET ?`
         return executeQuery(sql, userParams);
@@ -87,8 +69,12 @@ class UserModel {
         return executeQuery(sql);
     }
 
-}
+    dataRecovery(userToken) {
+        const sql = `SELECT * FROM user WHERE userToken='${userToken}'`
+        return executeQuery(sql);
+    }
 
+}
 
 module.exports = new UserModel();
 

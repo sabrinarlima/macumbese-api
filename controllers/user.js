@@ -1,5 +1,6 @@
 const UserModel = require('../models/user');
 const authentication = require('../middlewares/authentication');
+const UserParser = require('../parser/UserParser');
 
 module.exports = app => {
     app.post('/user/login', async (req, res) => {
@@ -50,6 +51,19 @@ module.exports = app => {
         } else {
             res.status(404).json(user);
         }
-    });
+    })
+
+    app.get('/user/profile', async (req, res) => {
+        const token = req.get("Authorization-Token");
+
+        const recovery = await UserModel.dataRecovery(token);
+
+        if (recovery.length > 0) {
+            const userEntity = recovery[0];
+            res.status(200).json(UserParser.toDto(userEntity));
+        } else {
+            res.status(403).send();
+        }
+    })
 }
 
