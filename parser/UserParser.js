@@ -8,16 +8,16 @@ class UserParser {
         return {
             name: userDTO.name,
             email: userDTO.email,
-            relationType: user['relation-type'],
+            relationType: userDTO['relation-type'],
             password: userDTO.password,
-            dtBirth: moment(user['date-of-birth'], 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss'),
-            streetAd: user['street-address'],
+            dtBirth: moment(userDTO['date-of-birth'], 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss'),
+            streetAd: userDTO['street-address'],
             zipcode: userDTO.zipcode,
             city: userDTO.city,
             state: userDTO.state,
             phone1: userDTO.phone,
-            phone2: user['phone-2'],
-            dueDay: user['due-day'],
+            phone2: userDTO['phone-2'],
+            dueDay: userDTO['due-day'],
             since: moment(userDTO.since, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss')
         };
     }
@@ -36,7 +36,7 @@ class UserParser {
             'state': userEntity.state,
             'phone': userEntity.phone1,
             'phone-2': userEntity.phone2,
-            'due-day': userEntity.dueDay,   
+            'due-day': userEntity.dueDay,
             since: moment(userEntity.since, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY')
         };
     }

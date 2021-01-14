@@ -36,6 +36,15 @@ class UserModel {
         return token;
     }
 
+    updateUser(userDTO, userToken) {
+        const userEntity = UserParser.toEntity(userDTO);
+        const { name, email, relationType, password, dtBirth, streetAd, city, state, phone1, phone2, dueDay } = userEntity;
+        const sql = `UPDATE user SET name='${name}', email='${email}', relationType='${relationType}', password='${password}', `
+            + `dtBirth='${dtBirth}', streetAd='${streetAd}', city='${city}', state='${state}', phone1='${phone1}',`
+            + ` phone2='${phone2}', dueDay='${dueDay}' WHERE userToken='${userToken}'`
+        return executeQuery(sql);
+    }
+
     insertUser(user) {
         const userParams = UserParser.toEntity(user);
         userParams.id = uuidv4();

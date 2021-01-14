@@ -65,5 +65,18 @@ module.exports = app => {
             res.status(403).send();
         }
     })
+
+    app.put('/user/profile/update', authentication, async (req, res) => {
+        const token = req.get("Authorization-Token");
+        const userRequest = req.body;
+
+        try {
+            await UserModel.updateUser(userRequest, token);
+            res.status(200).send();
+        } catch (err) {
+            console.error(err);
+            res.status(422).send();
+        }
+    });
 }
 
