@@ -7,7 +7,9 @@ module.exports = async (req, res, next) => {
     if(result.length == 0) {
         res.status(403).json({error: 'Você não esta logado'})
         return;
-    } 
+    }
+
+    req.params.contextUserId = result[0].id;
 
     next();
 };

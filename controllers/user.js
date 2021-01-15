@@ -1,6 +1,10 @@
 const UserModel = require('../models/user');
+const BillingModel = require('../models/billing');
 const authentication = require('../middlewares/authentication');
 const UserParser = require('../parser/UserParser');
+const BillingParser = require('../parser/BillingParser');
+const moment = require('moment');
+const billing = require('../models/billing');
 
 module.exports = app => {
     app.post('/user/login', async (req, res) => {
@@ -53,7 +57,7 @@ module.exports = app => {
         }
     })
 
-    app.get('/user/profile', async (req, res) => {
+    app.get('/user/profile', authentication, async (req, res) => {
         const token = req.get("Authorization-Token");
 
         const recovery = await UserModel.dataRecovery(token);
@@ -77,6 +81,35 @@ module.exports = app => {
             console.error(err);
             res.status(422).send();
         }
+    });
+
+    app.get('/user/dashboard', authentication, async (req, res) => {
+        const userId = req.params.contextUserId;
+        const pendingBillings = await BillingModel.getPendingBillingsByUserId(userId);
+
+        const currentDate = new Date();
+
+        let responsePendingBillings = [];
+        let responseNextDueBillings = [];
+
+        for (let i in pendingBillings) {
+            const billing = pendingBillings[i];
+
+            if (moment(currentDate).isAfter(billing.due_date)) {
+                responsePendingBillings.push(BillingParser.toDto(billing));
+                continue;
+            }
+
+            responseNextDueBillings.push(BillingParser.toDto(billing));
+        }
+
+        res.status(200).json(
+            {
+                billings: {
+                    pending: responsePendingBillings,
+                    'next-due': responseNextDueBillings
+                }
+            });
     });
 }
 
