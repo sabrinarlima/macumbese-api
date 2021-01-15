@@ -1,5 +1,4 @@
 const moment = require('moment');
-const user = require('../models/user');
 
 class UserParser {
 
