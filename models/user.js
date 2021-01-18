@@ -1,6 +1,7 @@
 const { executeQuery } = require('../config/database');
 const { v4: uuidv4 } = require('uuid');
 const UserParser = require('../parser/UserParser');
+const { restart } = require('nodemon');
 
 const mapProperties = {
     'name': 'name',
@@ -87,13 +88,31 @@ class UserModel {
         const sql = `SELECT * FROM user WHERE userToken='${userToken}' AND userRole = '${userRole}'`
         return executeQuery(sql);
     }
-    getPendingsCount(sortType = 'name') {
-        const sql = `SELECT u.name, u.relationType, COUNT(b.id) as 'debts_count'
+    getPendingsCount(sortBy, sortDirection = 'ASC') {
+        const mapParameters = {
+            'name': 1,
+            'relation-type': 2,
+            'debts-count': 3
+        }
+
+        const validDirections = ['ASC', 'DESC'];
+
+        if(!validDirections.includes(sortDirection)) { 
+            throw new Error("Invalid Sort field");
+        }
+
+        const fieldIndex = mapParameters[sortBy];
+
+        if(!fieldIndex) {
+            throw new Error("Invalid Sort field");
+        }
+
+        const sql = `SELECT u.name, u.relationType as "relation-type", COUNT(b.id) as "debts-count"
                         FROM macumbese.user u
                         JOIN macumbese.billing b on b.user_id = u.id
                         WHERE b.pay_date is null
                         GROUP BY b.user_id
-                        ORDER BY '${sortType}'`;
+                        ORDER BY ${fieldIndex} ${sortDirection}`;
         return executeQuery(sql);
 
     }
