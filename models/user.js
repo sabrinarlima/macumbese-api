@@ -83,6 +83,11 @@ class UserModel {
         return executeQuery(sql);
     }
 
+    validateRole(userToken, userRole) {
+        const sql = `SELECT * FROM user WHERE userToken='${userToken}' AND userRole = '${userRole}'`
+        return executeQuery(sql);
+    }
+
 }
 
 module.exports = new UserModel();

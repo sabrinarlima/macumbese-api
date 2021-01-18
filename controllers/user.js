@@ -1,10 +1,12 @@
 const UserModel = require('../models/user');
 const BillingModel = require('../models/billing');
-const authentication = require('../middlewares/authentication');
 const UserParser = require('../parser/UserParser');
 const BillingParser = require('../parser/BillingParser');
 const moment = require('moment');
-const billing = require('../models/billing');
+
+// middlewares
+const authenticationMiddleware = require('../middlewares/authentication');
+const adminMiddleware = require('../middlewares/admin');
 
 module.exports = app => {
     app.post('/user/login', async (req, res) => {
@@ -57,7 +59,7 @@ module.exports = app => {
         }
     })
 
-    app.get('/user/profile', authentication, async (req, res) => {
+    app.get('/user/profile', authenticationMiddleware, async (req, res) => {
         const token = req.get("Authorization-Token");
 
         const recovery = await UserModel.dataRecovery(token);
@@ -70,7 +72,7 @@ module.exports = app => {
         }
     })
 
-    app.put('/user/profile/update', authentication, async (req, res) => {
+    app.put('/user/profile/update', authenticationMiddleware, async (req, res) => {
         const token = req.get("Authorization-Token");
         const userRequest = req.body;
 
@@ -83,10 +85,9 @@ module.exports = app => {
         }
     });
 
-    app.get('/user/dashboard', authentication, async (req, res) => {
+    app.get('/user/dashboard', authenticationMiddleware, async (req, res) => {
         const userId = req.params.contextUserId;
         const pendingBillings = await BillingModel.getPendingBillingsByUserId(userId);
-
         const currentDate = new Date();
 
         let responsePendingBillings = [];
@@ -111,5 +112,5 @@ module.exports = app => {
                 }
             });
     });
-}
 
+}
