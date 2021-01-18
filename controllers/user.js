@@ -112,5 +112,32 @@ module.exports = app => {
                 }
             });
     });
+    app.get('/user/admin/list-users', adminMiddleware, async (req, res) => {
+        const pendingBillings = await UserModel.getPendingsCount();
 
+        if (pendingBillings == 0) {
+            res.status(204).send('Você não possui pendencias');
+        } else {
+            res.status(200).json({ profiles: pendingBillings });
+        }
+
+    });
+    //TODO: Criar função que atenda o path GET -/user/admin/list-users
+    //TODO: Adicionar middleware para verificar autenticação de admin
+    /*TODO: Criar resposta de retorno igual ao exemplo:
+     * 
+        {
+            "profiles": [
+                {
+                    "name": "Wagner Ramos",
+                    "relation_type": "FILIADO",
+                    "debts_count": 3,
+                }
+            ]
+        }
+     * 
+     */
+    /*TODO: receber parametros de query string `sort-by`. Que será utilizado para definir ordenação da listagem.
+    * Valores possíveis: "name", "relation_type", "debts_count"
+    */
 }

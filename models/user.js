@@ -87,6 +87,16 @@ class UserModel {
         const sql = `SELECT * FROM user WHERE userToken='${userToken}' AND userRole = '${userRole}'`
         return executeQuery(sql);
     }
+    getPendingsCount(sortType = 'name') {
+        const sql = `SELECT u.name, u.relationType, COUNT(b.id) as 'debts_count'
+                        FROM macumbese.user u
+                        JOIN macumbese.billing b on b.user_id = u.id
+                        WHERE b.pay_date is null
+                        GROUP BY b.user_id
+                        ORDER BY '${sortType}'`;
+        return executeQuery(sql);
+
+    }
 
 }
 
