@@ -112,5 +112,21 @@ module.exports = app => {
                 }
             });
     });
+    app.get('/user/admin/list-users', adminMiddleware, async (req, res) => {
+        const { 'sort-by': sortBy, 'sort-direction': sortDirection, } = req.query;
+        
+        try {
+            const pendingBillings = await UserModel.getPendingsCount(sortBy, sortDirection.toUpperCase());
+            if (pendingBillings == 0) {
+                res.status(204).send('Você não possui pendencias');
+            } else {
+                res.status(200).json({ profiles: pendingBillings });
+            }
 
+        } catch (err) {
+            console.error(err);
+            res.status(422).send();
+        }
+
+    });
 }
