@@ -11,10 +11,12 @@ class BillingModel {
         return executeQuery(sql);
     }
 
-    putBillingSettings(value) {
-        const sql = `INSERT INTO billing_settings ('value') VALUES (${value})`
+    updatePendingBillings({ value }) {
+        const sql = `UPDATE billing_settings
+        SET value = '${value}'`
         return executeQuery(sql);
     }
+
 }
 
 module.exports = new BillingModel();
