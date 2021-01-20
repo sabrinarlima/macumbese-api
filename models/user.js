@@ -58,6 +58,11 @@ class UserModel {
         return executeQuery(sql);
     }
 
+    async getUserById(userId) {
+        const sql = `SELECT name, relationType FROM user WHERE id = '${userId}'`
+        return executeQuery(sql);
+    }
+
     verifyByUser(user) {
         const sql = `SELECT * FROM user`;
         let whereClause = ` WHERE`;
@@ -97,13 +102,13 @@ class UserModel {
 
         const validDirections = ['ASC', 'DESC'];
 
-        if(!validDirections.includes(sortDirection)) { 
+        if (!validDirections.includes(sortDirection)) {
             throw new Error("Invalid Sort field");
         }
 
         const fieldIndex = mapParameters[sortBy];
 
-        if(!fieldIndex) {
+        if (!fieldIndex) {
             throw new Error("Invalid Sort field");
         }
 
@@ -116,7 +121,22 @@ class UserModel {
         return executeQuery(sql);
 
     }
+    getPendings(userId) {
 
+        const sql = `SELECT u.name,
+        u.relationType,
+        u.id,
+        b.id,
+        b.due_date,
+        b.value
+       FROM macumbese.user u
+       JOIN macumbese.billing b ON b.user_id = u.id
+       WHERE b.pay_date IS NULL and u.id = '${userId}'
+       GROUP BY b.id
+       ORDER BY due_date;`
+
+        return executeQuery(sql);
+    }
 
 }
 
