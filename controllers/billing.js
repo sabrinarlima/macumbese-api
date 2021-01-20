@@ -14,4 +14,15 @@ module.exports = app => {
             res.status(422).send();
         }
     })
+    app.put('/billings/settings', adminMiddleware, async (req, res) => {
+        const settings = req.body;
+        try {
+            await BillingModel.updatePendingBillings(settings);
+            res.status(200).send();
+        } catch (err) {
+            console.error(err);
+            res.status(422).send();
+        }
+    });
+
 }

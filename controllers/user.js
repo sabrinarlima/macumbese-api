@@ -102,7 +102,7 @@ module.exports = app => {
             }
 
             responseNextDueBillings.push(BillingParser.toDto(billing));
-        }
+        }   
 
         res.status(200).json(
             {
@@ -127,6 +127,8 @@ module.exports = app => {
             console.error(err);
             res.status(422).send();
         }
-
+       
     });
+
+
 }
