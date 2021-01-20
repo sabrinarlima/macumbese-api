@@ -1,12 +1,12 @@
 const UserModel = require('../models/user');
-const BillingModel = require('../models/billing');
 const UserParser = require('../parser/UserParser');
-const BillingParser = require('../parser/BillingParser');
-const moment = require('moment');
+const UserBillingService = require('../services/user_billing');
 
 // middlewares
 const authenticationMiddleware = require('../middlewares/authentication');
 const adminMiddleware = require('../middlewares/admin');
+const { response } = require('express');
+
 
 module.exports = app => {
     app.post('/user/login', async (req, res) => {
@@ -87,34 +87,17 @@ module.exports = app => {
 
     app.get('/user/dashboard', authenticationMiddleware, async (req, res) => {
         const userId = req.params.contextUserId;
-        const pendingBillings = await BillingModel.getPendingBillingsByUserId(userId);
-        const currentDate = new Date();
-
-        let responsePendingBillings = [];
-        let responseNextDueBillings = [];
-
-        for (let i in pendingBillings) {
-            const billing = pendingBillings[i];
-
-            if (moment(currentDate).isAfter(billing.due_date)) {
-                responsePendingBillings.push(BillingParser.toDto(billing));
-                continue;
-            }
-
-            responseNextDueBillings.push(BillingParser.toDto(billing));
-        }   
+        const billings = await UserBillingService.getUserBillings(userId);
 
         res.status(200).json(
             {
-                billings: {
-                    pending: responsePendingBillings,
-                    'next-due': responseNextDueBillings
-                }
+                billings
             });
     });
+
     app.get('/user/admin/list-users', adminMiddleware, async (req, res) => {
         const { 'sort-by': sortBy, 'sort-direction': sortDirection, } = req.query;
-        
+
         try {
             const pendingBillings = await UserModel.getPendingsCount(sortBy, sortDirection.toUpperCase());
             if (pendingBillings == 0) {
@@ -127,8 +110,26 @@ module.exports = app => {
             console.error(err);
             res.status(422).send();
         }
-       
+
     });
 
 
+    app.get('/user/:userId/billings', authenticationMiddleware, async (req, res) => {
+        const { userId } = req.params;
+        const promises = [];
+        promises.push(UserModel.getUserById(userId));
+        promises.push(UserBillingService.getUserBillings(userId));
+        const results = await Promise.all(promises);
+    
+        const profiles = results[0];
+        const billings = results[1];
+        const { name, relationType } = profiles[0]
+        res.status(200).json({
+            profile: {
+                name,
+                'relation-type': relationType,
+                billings
+            }
+        });
+    });
 }
