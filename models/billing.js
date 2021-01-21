@@ -16,7 +16,11 @@ class BillingModel {
         SET value = '${value}'`
         return executeQuery(sql);
     }
-
+setPayBillings(billingId) {
+    const sql = `UPDATE billing
+        SET pay_date = Now() WHERE id = '${billingId}' AND pay_date is null`
+        return executeQuery(sql);
+}
 }
 
 module.exports = new BillingModel();
