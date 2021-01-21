@@ -11,8 +11,11 @@ const { response } = require('express');
 module.exports = app => {
     app.post('/user/login', async (req, res) => {
         const credentials = req.body;
+        const crypto = require('crypto')
+        let hash = crypto.createHash('md5').update(credentials.password).digest("hex")
+
         try {
-            const result = await UserModel.searchForUser(credentials.email, credentials.password);
+            const result = await UserModel.searchForUser(credentials.email, hash);
             if (result.length == 0) {
                 res.status(401).send();
                 return;
@@ -29,6 +32,9 @@ module.exports = app => {
     app.post('/user/sign-up', async (req, res) => {
         const user = req.body;
 
+        const crypto = require('crypto')
+        let hash = crypto.createHash('md5').update(user.password).digest("hex")
+        
         try {
 
             const result = await UserModel.getUserByEmail(user.email)
@@ -36,7 +42,7 @@ module.exports = app => {
                 res.status(400).json({ error: 'e-mail já cadastrado' });
                 return;
             }
-
+            user.password = hash
             await UserModel.insertUser(user)
             res.status(200).json(user);
 
@@ -50,7 +56,8 @@ module.exports = app => {
     app.post('/user/verify', async (req, res) => {
         const user = req.body;
 
-        const verify = await UserModel.verifyByUser(user)
+
+        const verify = await UserModel.verifyByUser(user, hash)
 
         if (verify.length > 0) {
             res.status(204).json({ error: 'Estes dados já estão cadastrados' })
@@ -83,7 +90,7 @@ module.exports = app => {
             console.error(err);
             res.status(422).send();
         }
-    });
+    }); 
 
     app.get('/user/dashboard', authenticationMiddleware, async (req, res) => {
         const userId = req.params.contextUserId;
@@ -120,7 +127,7 @@ module.exports = app => {
         promises.push(UserModel.getUserById(userId));
         promises.push(UserBillingService.getUserBillings(userId));
         const results = await Promise.all(promises);
-    
+
         const profiles = results[0];
         const billings = results[1];
         const { name, relationType } = profiles[0]
